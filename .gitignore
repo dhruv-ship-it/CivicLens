@@ -1,0 +1,103 @@
+# -------------------------
+# GENERAL
+# -------------------------
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.cache
+*.swp
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# Virtual environments
+.venv/
+venv/
+env/
+.idea/
+
+# -------------------------
+# NODE PROJECTS
+# -------------------------
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Dist or build directories
+dist/
+build/
+out/
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.development
+
+# Coverage
+coverage/
+
+# -------------------------
+# FRONTEND (React/Vite/Next)
+# -------------------------
+frontend_citizen/node_modules/
+frontend_citizen/.env
+frontend_citizen/dist/
+frontend_citizen/build/
+
+frontend_department/node_modules/
+frontend_department/.env
+frontend_department/dist/
+frontend_department/build/
+
+# -------------------------
+# BACKEND
+# -------------------------
+backend/node_modules/
+backend/dist/
+backend/build/
+backend/.env
+backend/package-lock.json
+
+# Logs
+backend/logs/
+backend/*.log
+
+# -------------------------
+# PYTHON ML SERVICE
+# -------------------------
+backend/ml/__pycache__/
+backend/ml/*.pyc
+backend/ml/*.pyo
+backend/ml/*.pyd
+
+# ML cache
+backend/ml/checkpoints/
+backend/ml/runs/
+backend/ml/cache/
+
+# Virtual env
+backend/ml/.venv/
+backend/ml/venv/
+backend/ml/env/
+
+# Model files
+backend/ml/*.h5
+backend/ml/*.pb
+backend/ml/*.onnx
+
+# Training notebooks output
+**/*.ipynb_checkpoints/
+
+# -------------------------
+# MONGO STUFF
+# -------------------------
+dump/
+data/
+# Next.js build
+citizen/.next/
+department/.next/
+.next/

@@ -1,0 +1,2 @@
+# Requirements for the start_all_services.py script
+# (No additional requirements needed as it only uses standard library)
