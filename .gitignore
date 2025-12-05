@@ -1,103 +1,69 @@
-# -------------------------
-# GENERAL
-# -------------------------
-.DS_Store
-Thumbs.db
-*.log
-*.tmp
-*.cache
-*.swp
+# Node.js dependencies
+node_modules/
 
-# VSCode
-.vscode/
-*.code-workspace
-
-# Virtual environments
-.venv/
+# Python dependencies
 venv/
 env/
-.idea/
-
-# -------------------------
-# NODE PROJECTS
-# -------------------------
-node_modules/
-npm-debug.log
-yarn-debug.log
-yarn-error.log
-
-# Dist or build directories
-dist/
-build/
-out/
+__pycache__/
+*.pyc
 
 # Environment files
 .env
 .env.local
-.env.production
-.env.development
-
-# Coverage
-coverage/
-
-# -------------------------
-# FRONTEND (React/Vite/Next)
-# -------------------------
-frontend_citizen/node_modules/
-frontend_citizen/.env
-frontend_citizen/dist/
-frontend_citizen/build/
-
-frontend_department/node_modules/
-frontend_department/.env
-frontend_department/dist/
-frontend_department/build/
-
-# -------------------------
-# BACKEND
-# -------------------------
-backend/node_modules/
-backend/dist/
-backend/build/
-backend/.env
-backend/package-lock.json
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Logs
-backend/logs/
-backend/*.log
+logs
+*.log
 
-# -------------------------
-# PYTHON ML SERVICE
-# -------------------------
-backend/ml/__pycache__/
-backend/ml/*.pyc
-backend/ml/*.pyo
-backend/ml/*.pyd
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-# ML cache
-backend/ml/checkpoints/
-backend/ml/runs/
-backend/ml/cache/
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Virtual env
-backend/ml/.venv/
-backend/ml/venv/
-backend/ml/env/
+# Render files
+.render-buildpacks.json
+.render-buildpack-run.sh
 
-# Model files
-backend/ml/*.h5
-backend/ml/*.pb
-backend/ml/*.onnx
+# Backend specific
+backend-node/node_modules/
+backend-node/.env
+backend-node/logs/
 
-# Training notebooks output
-**/*.ipynb_checkpoints/
+backend-python/__pycache__/
+backend-python/*.pyc
+backend-python/venv/
+backend-python/.env
+backend-python/models/final_model_ResNet50.h5
 
-# -------------------------
-# MONGO STUFF
-# -------------------------
-dump/
-data/
-# Next.js build
+# Frontend specific
 citizen/.next/
+citizen/out/
+citizen/.env.local
+citizen/.env.development.local
+citizen/.env.test.local
+citizen/.env.production.local
+citizen/.npmrc
+citizen/.yarn/cache
+
 department/.next/
-.next/
+department/out/
+department/.env.local
+department/.env.development.local
+department/.env.test.local
+department/.env.production.local
+department/.npmrc
+department/.yarn/cache

@@ -55,9 +55,9 @@ If you see the MongoDB shell, you're good to go!
 
 ## Database Configuration
 
-### 1. Create `.env` file in the `backend` folder
+### 1. Create `.env` file in the `backend-node` folder
 
-Create a file named `.env` in the `backend` directory:
+Create a file named `.env` in the `backend-node` directory:
 
 ```env
 # MongoDB Connection
@@ -75,6 +75,9 @@ PORT=5000
 
 # CORS Origins (comma-separated)
 CORS_ORIGINS=http://localhost:3000,http://localhost:3001
+
+# ML Service URL
+ML_SERVICE_URL=http://localhost:5001/predict
 ```
 
 ### 2. Database Collections
@@ -102,7 +105,7 @@ The application will automatically create these collections when you start using
 ### 1. Install Backend Dependencies
 
 ```bash
-cd backend
+cd backend-node
 npm install
 ```
 
@@ -136,7 +139,7 @@ If you see an error, check:
 
 Once everything is running:
 
-1. Start the backend: `cd backend && npm run dev`
+1. Start the backend: `cd backend-node && npm run dev`
 2. Start the citizen frontend: `cd citizen && npm run dev`
 3. Start the department frontend: `cd department && npm run dev`
 
