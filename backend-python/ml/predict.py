@@ -3,6 +3,31 @@ import io
 import numpy as np
 from flask import Flask, request, jsonify
 import tensorflow as tf
+import requests
+from pathlib import Path
+
+# --- add at top of file, after imports ---
+MODEL_FILENAME = "model.h5"
+MODEL_PATH = Path(__file__).parent / MODEL_FILENAME
+
+def download_model_if_missing():
+    # If model exists already (local dev) — skip download
+    if MODEL_PATH.exists():
+        print(f"Model already present at {MODEL_PATH}")
+        return
+
+    url = os.environ.get("MODEL_DOWNLOAD_URL")
+    if not url:
+        raise RuntimeError("MODEL_DOWNLOAD_URL not set and model not found locally")
+
+    print(f"Downloading model from {url} ...")
+    resp = requests.get(url, stream=True)
+    resp.raise_for_status()
+    with open(MODEL_PATH, "wb") as f:
+        for chunk in resp.iter_content(chunk_size=8192):
+            if chunk:
+                f.write(chunk)
+    print("Model downloaded successfully.")
 
 # Disable GPU if needed (can help with some compatibility issues)
 tf.config.set_visible_devices([], 'GPU')
@@ -11,7 +36,7 @@ tf.config.set_visible_devices([], 'GPU')
 app = Flask(__name__)
 
 # Load the model once at startup
-MODEL_PATH = os.environ.get('MODEL_PATH') or os.path.join(os.path.dirname(__file__), '..', 'models', 'final_model_ResNet50.h5')
+MODEL_PATH_ENV = os.environ.get('MODEL_PATH') or MODEL_PATH
 model = None
 
 # Class mapping (from your notebook)
@@ -40,7 +65,7 @@ def load_model_once():
         try:
             # Try the standard approach first
             import keras
-            model = keras.models.load_model(MODEL_PATH, compile=False)
+            model = keras.models.load_model(MODEL_PATH_ENV, compile=False)
             print("Model loaded successfully with standard approach!")
         except Exception as e1:
             print(f"Standard model loading failed: {e1}")
@@ -70,7 +95,7 @@ def load_model_once():
                 reconstructed_model = Model(inputs=base_model.input, outputs=output)
                 
                 # Load only the weights
-                reconstructed_model.load_weights(MODEL_PATH, by_name=True, skip_mismatch=True)
+                reconstructed_model.load_weights(MODEL_PATH_ENV, by_name=True, skip_mismatch=True)
                 
                 model = reconstructed_model
                 print("Model loaded successfully with reconstruction approach!")
@@ -200,6 +225,9 @@ def health():
         return jsonify({'status': 'unhealthy', 'message': f'ML service error: {str(e)}', 'model': 'error'})
 
 if __name__ == '__main__':
+    # Download model if missing
+    download_model_if_missing()
+    
     # Load model on startup
     load_model_once()
     
