@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose"
 
 export type ComplaintCategory = "waterlogging" | "potholes" | "garbages" | "streetlight" | "others"
+export type ComplaintStatus = "active" | "resolved"
 
 export interface IComplaint extends Document {
   username: string
@@ -10,6 +11,7 @@ export interface IComplaint extends Document {
   pincode: string
   upvote: number
   downvote: number
+  status: ComplaintStatus
   createdAt: Date
   updatedAt: Date
 }
@@ -22,32 +24,35 @@ const ComplaintSchema = new Schema<IComplaint>(
     },
     category: {
       type: String,
-      required: true,
       enum: ["waterlogging", "potholes", "garbages", "streetlight", "others"],
+      required: true,
     },
     address: {
       type: String,
       required: true,
-      trim: true,
     },
     description: {
       type: String,
       trim: true,
+      maxlength: 500,
     },
     pincode: {
       type: String,
       required: true,
-      match: [/^\d{6}$/, "Pincode must be a 6-digit number"],
+      match: /^\d{6}$/, // Indian pincode format
     },
     upvote: {
       type: Number,
       default: 0,
-      min: 0,
     },
     downvote: {
       type: Number,
       default: 0,
-      min: 0,
+    },
+    status: {
+      type: String,
+      enum: ["active", "resolved"],
+      default: "active",
     },
   },
   {
@@ -56,10 +61,11 @@ const ComplaintSchema = new Schema<IComplaint>(
 )
 
 // Indexes for efficient querying
-ComplaintSchema.index({ pincode: 1 })
-ComplaintSchema.index({ category: 1 })
 ComplaintSchema.index({ pincode: 1, category: 1 })
 ComplaintSchema.index({ createdAt: -1 })
+ComplaintSchema.index({ upvote: -1, createdAt: -1 }) // For department sorting by popularity
+ComplaintSchema.index({ pincode: 1 })
+ComplaintSchema.index({ username: 1 })
+ComplaintSchema.index({ status: 1 })
 
 export const Complaint = mongoose.model<IComplaint>("Complaint", ComplaintSchema)
-

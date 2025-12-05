@@ -20,8 +20,25 @@ export interface Complaint {
   pincode: string
   upvotes: number
   downvotes: number
+  status: "active" | "resolved"
   createdAt: string
   userVote?: "upvote" | "downvote" | null
+}
+
+export interface Comment {
+  id: string
+  complaintId: string
+  username: string
+  content: string
+  createdAt: string
+}
+
+export interface Pagination {
+  currentPage: number
+  totalPages: number
+  totalComments: number
+  hasNextPage: boolean
+  hasPrevPage: boolean
 }
 
 // Get token from localStorage
@@ -56,7 +73,7 @@ async function apiRequest<T>(
   }
 
   if (token) {
-    (headers as any).Authorization = `Bearer ${token}`
+    (headers as any)["Authorization"] = `Bearer ${token}`
   }
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -147,6 +164,10 @@ export const complaints = {
     return apiRequest<{ complaints: Complaint[] }>("/complaints/user")
   },
 
+  getUserResolvedComplaints: async (): Promise<{ complaints: Complaint[] }> => {
+    return apiRequest<{ complaints: Complaint[] }>("/complaints/user/resolved")
+  },
+
   upvote: async (complaintId: string): Promise<{ upvote: number; downvote: number; userVote: "upvote" | "downvote" | null }> => {
     return apiRequest<{ upvote: number; downvote: number; userVote: "upvote" | "downvote" | null }>(`/complaints/${complaintId}/upvote`, {
       method: "POST",
@@ -158,5 +179,21 @@ export const complaints = {
       method: "POST",
     })
   },
+  
+  // Comment APIs
+  addComment: async (complaintId: string, content: string): Promise<{ comment: Comment }> => {
+    return apiRequest<{ comment: Comment }>(`/complaints/${complaintId}/comments`, {
+      method: "POST",
+      body: JSON.stringify({ content }),
+    })
+  },
+  
+  getComments: async (complaintId: string, page: number = 1, limit: number = 10): Promise<{ 
+    comments: Comment[]; 
+    pagination: Pagination 
+  }> => {
+    return apiRequest<{ comments: Comment[]; pagination: Pagination }>(
+      `/complaints/${complaintId}/comments?page=${page}&limit=${limit}`
+    )
+  },
 }
-

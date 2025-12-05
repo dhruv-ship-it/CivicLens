@@ -22,35 +22,76 @@ const categories: Array<Complaint["category"]> = ["waterlogging", "potholes", "g
 export default function HomePage() {
   const { user } = useAuth()
   const [selectedCategories, setSelectedCategories] = useState<Complaint["category"][]>([])
-  const [complaintsList, setComplaintsList] = useState<Complaint[]>([])
-  const [loading, setLoading] = useState(true)
+  const [activeComplaints, setActiveComplaints] = useState<Complaint[]>([])
+  const [resolvedComplaints, setResolvedComplaints] = useState<Complaint[]>([])
+  const [loadingActive, setLoadingActive] = useState(true)
+  const [loadingResolved, setLoadingResolved] = useState(true)
+  const [showResolved, setShowResolved] = useState(false)
 
   useEffect(() => {
     if (user) {
-      loadComplaints()
+      loadActiveComplaints()
+      loadResolvedComplaints()
     }
   }, [user])
 
-  const loadComplaints = async () => {
+  const loadActiveComplaints = async () => {
     try {
-      setLoading(true)
+      setLoadingActive(true)
       const data = await complaints.getUserComplaints()
-      setComplaintsList(data.complaints)
+      setActiveComplaints(data.complaints)
     } catch (error) {
-      console.error("Failed to load complaints:", error)
+      console.error("Failed to load active complaints:", error)
     } finally {
-      setLoading(false)
+      setLoadingActive(false)
     }
   }
 
-  const filteredComplaints =
-    selectedCategories.length > 0
-      ? complaintsList.filter((c) => selectedCategories.includes(c.category))
-      : complaintsList
+  const loadResolvedComplaints = async () => {
+    try {
+      setLoadingResolved(true)
+      const data = await complaints.getUserResolvedComplaints()
+      setResolvedComplaints(data.complaints)
+    } catch (error) {
+      console.error("Failed to load resolved complaints:", error)
+    } finally {
+      setLoadingResolved(false)
+    }
+  }
 
-  const toggleCategory = (category: Category) => {
+  const filteredActiveComplaints =
+    selectedCategories.length > 0
+      ? activeComplaints.filter((c) => selectedCategories.includes(c.category))
+      : activeComplaints
+
+  const filteredResolvedComplaints =
+    selectedCategories.length > 0
+      ? resolvedComplaints.filter((c) => selectedCategories.includes(c.category))
+      : resolvedComplaints
+
+  const toggleCategory = (category: Complaint["category"]) => {
     setSelectedCategories((prev) =>
       prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category],
+    )
+  }
+
+  const handleVoteUpdate = (complaintId: string, upvotes: number, downvotes: number, userVote: "upvote" | "downvote" | null) => {
+    // Update in active complaints
+    setActiveComplaints(prev => 
+      prev.map(complaint => 
+        complaint.id === complaintId 
+          ? { ...complaint, upvotes, downvotes, userVote } 
+          : complaint
+      )
+    )
+    
+    // Update in resolved complaints
+    setResolvedComplaints(prev => 
+      prev.map(complaint => 
+        complaint.id === complaintId 
+          ? { ...complaint, upvotes, downvotes, userVote } 
+          : complaint
+      )
     )
   }
 
@@ -117,21 +158,67 @@ export default function HomePage() {
           )}
         </div>
 
-        <div className="space-y-4 pb-24">
-          {loading ? (
-            <div className="rounded-lg border border-dashed bg-card p-12 text-center">
-              <p className="text-muted-foreground">Loading complaints...</p>
-            </div>
-          ) : filteredComplaints.length > 0 ? (
-            filteredComplaints.map((complaint) => (
-              <ComplaintCard key={complaint.id} complaint={complaint} onUpdate={loadComplaints} />
-            ))
-          ) : (
-            <div className="rounded-lg border border-dashed bg-card p-12 text-center">
-              <p className="text-muted-foreground">No complaints found for the selected filters.</p>
-            </div>
-          )}
+        {/* Active Complaints Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Active Complaints</h2>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setShowResolved(!showResolved)}
+            >
+              {showResolved ? "Hide Resolved" : "Show Resolved"} ({resolvedComplaints.length})
+            </Button>
+          </div>
+
+          <div className="space-y-4">
+            {loadingActive ? (
+              <div className="rounded-lg border border-dashed bg-card p-12 text-center">
+                <p className="text-muted-foreground">Loading complaints...</p>
+              </div>
+            ) : filteredActiveComplaints.length > 0 ? (
+              filteredActiveComplaints.map((complaint) => (
+                <ComplaintCard 
+                  key={complaint.id} 
+                  complaint={complaint} 
+                  currentUser={user?.username || ""} 
+                  onVoteUpdate={handleVoteUpdate}
+                />
+              ))
+            ) : (
+              <div className="rounded-lg border border-dashed bg-card p-12 text-center">
+                <p className="text-muted-foreground">No active complaints found for the selected filters.</p>
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Resolved Complaints Section */}
+        {showResolved && (
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Resolved Complaints</h2>
+            <div className="space-y-4">
+              {loadingResolved ? (
+                <div className="rounded-lg border border-dashed bg-card p-12 text-center">
+                  <p className="text-muted-foreground">Loading resolved complaints...</p>
+                </div>
+              ) : filteredResolvedComplaints.length > 0 ? (
+                filteredResolvedComplaints.map((complaint) => (
+                  <ComplaintCard 
+                    key={complaint.id} 
+                    complaint={complaint} 
+                    currentUser={user?.username || ""} 
+                    onVoteUpdate={handleVoteUpdate}
+                  />
+                ))
+              ) : (
+                <div className="rounded-lg border border-dashed bg-card p-12 text-center">
+                  <p className="text-muted-foreground">No resolved complaints found for the selected filters.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </main>
 
       <FloatingActionButton />

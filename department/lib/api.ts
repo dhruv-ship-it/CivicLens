@@ -19,7 +19,24 @@ export interface Complaint {
   pincode: string
   upvotes: number
   downvotes: number
+  status: "active" | "resolved"
   createdAt: string
+}
+
+export interface Comment {
+  id: string
+  complaintId: string
+  username: string
+  content: string
+  createdAt: string
+}
+
+export interface Pagination {
+  currentPage: number
+  totalPages: number
+  totalComments: number
+  hasNextPage: boolean
+  hasPrevPage: boolean
 }
 
 // Get token from localStorage
@@ -51,7 +68,7 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
   }
 
   if (token) {
-    headers.Authorization = `Bearer ${token}`
+    (headers as any)["Authorization"] = `Bearer ${token}`
   }
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -107,10 +124,23 @@ export const complaints = {
     return apiRequest<{ complaints: Complaint[] }>("/complaints/department")
   },
 
-  resolve: async (complaintId: string): Promise<{ message: string }> => {
-    return apiRequest<{ message: string }>(`/complaints/${complaintId}`, {
-      method: "DELETE",
+  getDepartmentResolvedComplaints: async (): Promise<{ complaints: Complaint[] }> => {
+    return apiRequest<{ complaints: Complaint[] }>("/complaints/department/resolved")
+  },
+
+  resolve: async (complaintId: string): Promise<{ complaint: Complaint }> => {
+    return apiRequest<{ complaint: Complaint }>(`/complaints/${complaintId}/resolve`, {
+      method: "PUT",
     })
   },
+  
+  // Comment APIs
+  getComments: async (complaintId: string, page: number = 1, limit: number = 10): Promise<{ 
+    comments: Comment[]; 
+    pagination: Pagination 
+  }> => {
+    return apiRequest<{ comments: Comment[]; pagination: Pagination }>(
+      `/complaints/${complaintId}/comments?page=${page}&limit=${limit}`
+    )
+  },
 }
-

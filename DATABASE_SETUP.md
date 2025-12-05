@@ -90,8 +90,12 @@ The application will automatically create these collections when you start using
    - Indexes: department + pincode (composite unique), pincode
 
 3. **complaints** - User-submitted complaints
-   - Fields: username, category, address, description, pincode, upvote, downvote, createdAt, updatedAt
-   - Indexes: pincode, category, pincode + category, createdAt
+   - Fields: username, category, address, description, pincode, upvote, downvote, status, createdAt, updatedAt
+   - Indexes: pincode, category, pincode + category, createdAt, status
+
+4. **comments** - Comments on complaints
+   - Fields: complaintId, username, content, createdAt, updatedAt
+   - Indexes: complaintId, complaintId + createdAt, username
 
 ## Starting the Application
 
@@ -207,9 +211,23 @@ Try creating a user account in the citizen portal - if it works, your database i
   pincode: String (required, 6 digits),
   upvote: Number (default: 0),
   downvote: Number (default: 0),
+  status: String (enum: ["active", "resolved"], default: "active"),
   createdAt: Date,
   updatedAt: Date
 }
+```
+
+### Comments Collection
+```javascript
+{
+  _id: ObjectId,
+  complaintId: ObjectId (reference to complaint),
+  username: String (required),
+  content: String (required, max 500 characters),
+  createdAt: Date,
+  updatedAt: Date
+}
+// Indexes: complaintId, complaintId + createdAt (descending), username
 ```
 
 ## Next Steps
@@ -221,6 +239,7 @@ After setting up the database:
 3. ✅ Submit test complaints
 4. ✅ Test upvote/downvote functionality
 5. ✅ Test complaint resolution (department portal)
+6. ✅ Test comment functionality
+7. ✅ Test complaint status functionality (active/resolved)
 
 Good luck with your project! 🚀
-
