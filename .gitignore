@@ -47,7 +47,7 @@ backend-python/__pycache__/
 backend-python/*.pyc
 backend-python/venv/
 backend-python/.env
-backend-python/models/final_model_ResNet50.h5
+backend-python/models/*.h5
 
 # Frontend specific
 citizen/.next/
@@ -67,3 +67,11 @@ department/.env.test.local
 department/.env.production.local
 department/.npmrc
 department/.yarn/cache
+
+# Root level files to ignore
+package-lock.json
+start_all_services.py
+credentials.txt
+
+# Old backend directory
+backend/
