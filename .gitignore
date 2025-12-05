@@ -75,3 +75,4 @@ credentials.txt
 
 # Old backend directory
 backend/
+backend-python/*.h5
