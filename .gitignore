@@ -48,7 +48,6 @@ backend-python/*.pyc
 backend-python/venv/
 backend-python/.env
 backend-python/models/*.h5
-backend-python/ml/*.h5
 
 # Frontend specific
 citizen/.next/
@@ -76,3 +75,6 @@ credentials.txt
 
 # Old backend directory
 backend/
+
+# ML model files (should never be committed)
+*.h5

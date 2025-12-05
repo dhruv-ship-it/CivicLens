@@ -18,7 +18,15 @@ def download_model_if_missing():
 
     url = os.environ.get("MODEL_DOWNLOAD_URL")
     if not url:
-        raise RuntimeError("MODEL_DOWNLOAD_URL not set and model not found locally")
+        # For local development, check if model exists in the models directory
+        legacy_model_path = Path(__file__).parent.parent / "models" / "final_model_ResNet50.h5"
+        if legacy_model_path.exists():
+            print(f"Found legacy model at {legacy_model_path}, copying to {MODEL_PATH}")
+            import shutil
+            shutil.copy(legacy_model_path, MODEL_PATH)
+            return
+        else:
+            raise RuntimeError("MODEL_DOWNLOAD_URL not set and model not found locally")
 
     print(f"Downloading model from {url} ...")
     resp = requests.get(url, stream=True)
